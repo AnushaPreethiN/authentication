@@ -24,7 +24,7 @@ const initializeDBAndServer = async () => {
 initializeDBAndServer();
 
 //API1
-app.post("/register", async (request, response) => {
+app.post("/register/", async (request, response) => {
   const { username, name, password, gender, location } = request.body;
   const hashedPassword = await bcrypt.hash(request.body.password, 10);
   const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
@@ -46,17 +46,17 @@ app.post("/register", async (request, response) => {
         )`;
     const dbResponse = await db.run(createUserQuery);
     const passwordLength = password.length;
-    if (passwordLength > 5) {
-      const hashedPassword = await bcrypt.hash(request.body.password, 10);
-      response.send("User created successfully");
-    } else {
+    if (passwordLength < 5) {
       response.status(400);
       response.send("Password is too short");
+    } else {
+      const hashedPassword = await bcrypt.hash(request.body.password, 10);
+      response.send("User created successfully");
     }
   }
 });
 //API2
-app.post("/login", async (request, response) => {
+app.post("/login/", async (request, response) => {
   const { username, password } = request.body;
   const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
   const dbUser = await db.get(selectUserQuery);
@@ -76,7 +76,7 @@ app.post("/login", async (request, response) => {
   }
 });
 //API3
-app.put("/change-password", async (request, response) => {
+app.put("/change-password/", async (request, response) => {
   const { username, oldPassword, newPassword } = request.body;
   const checkUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
   const dbUser = await db.get(checkUserQuery);
